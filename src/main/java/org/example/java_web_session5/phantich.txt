@@ -1,0 +1,44 @@
+Bài 2: Sơ đồ luồng I/O
+GET /bai2/dishes -> DishController -> gọi DishService -> trả về List<Dish>
+-> Controller add vào Model -> model.addAttribute("dishes", list)
+-> Thymeleaf View: dish-list.html
+-> sử dụng  th:each + th:if ->  hiển thị trạng thái "Còn hàng"/"Hết hàng".
+
+
+Bài 3:
+ * Luồng xử lí
+View A: dish-list.html -> nhấn "Chỉnh sửa" -> GET /bai3/edit/{id}
+-> AdminDishController -> nhận id -> AdminDishService -> tìm dish theo id
+<-> Không tìm thấy: redirect:/bai2/dishes + errorMessage
+<-> Tìm thấy: Model.add(dish)   return edit-page -> View B: edit-dish.html
+-> sử dụng  th:object + th:field  -> Form được autofill dữ liệu cũ
+
+ * các biểu thức Thymeleaf sẽ sử dụng để liên kết (binding) dữ liệu
+ Bind object	th:object="${dish}"
+ Bind field	th:field="*{name}"
+ URL động	@{/bai3/edit/{id}(id=${dish.id})}
+ Literal	`@{}
+
+
+Bài 4
+ *  2 cách tiếp cận
+(A) Copy-paste Header/Footer vào từng file
+- Tính tái sử dụng không cao, lặp lại code nhiều
+- Khi sửa 1 chỗ, phải sửa nhiều file liên quan
+- Rối khi project lớn
+- Tốc độ code ban đầu nhanh (chỉ cần copy)  <=> nguy cơ lỗi cao, thiếu đồng bộ, khả năng mở rộng kém
+
+(B) Sử dụng layout:decorate
+- Có thể tái sử dụng, dùng lại layout
+- Dễ bảo trì, chỉ cần sửa 1 file layout chính
+- Phân tầng rõ ràng
+- Thời gian setup ban đầu lâu hơn  <=> rõ ràng, nguy cơ lỗi thấp hơn, khả năng mở rộng cao
+
+=> Project nhỏ -> có thể dùng (A)
+   Project thực tế / production -> BẮT BUỘC dùng (B)
+
+ * Tại sao phải đăng ký LayoutDialect trong SpringTemplateEngine?
+1. Layout Dialect KHÔNG phải mặc định của Thymeleaf
+- Thymeleaf chỉ có: th:* (Standard Dialect)
+- Còn: layout:* -> thuộc thư viện bên ngoài
+2. Nếu không đăng kí sẽ lỗi: Unknown attribute 'layout:decorate'
